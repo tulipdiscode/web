@@ -374,5 +374,204 @@
 </div>
 <!-- 页脚结束 --> 
 <script type="text/javascript" src="style/js/scripts.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const commentForm = document.getElementById('commentform');
+    
+    commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 获取表单数据
+        const author = document.getElementById('author').value;
+        const email = document.getElementById('email').value;
+        const url = document.getElementById('url').value;
+        const comment = document.getElementById('comment').value;
+        
+        // 验证必填字段
+        if(!author || !email || !comment) {
+            showMessage('请填写必填项（姓名、邮箱和评论内容）', 'error');
+            return;
+        }
+        
+        // 验证邮箱格式
+        if(!isValidEmail(email)) {
+            showMessage('请输入正确的邮箱格式', 'error');
+            return;
+        }
+        
+        // 显示提交中状态
+        showLoadingMessage('评论提交中...');
+        
+        // 模拟提交过程
+        setTimeout(() => {
+            // 创建新评论HTML
+            const newComment = createCommentHTML(author, comment);
+            
+            // 添加到评论列表
+            const commentList = document.getElementById('singlecomments');
+            commentList.insertAdjacentHTML('beforeend', newComment);
+            
+            // 更新评论数
+            updateCommentCount();
+            
+            // 显示成功消息
+            showMessage('评论发表成功！', 'success');
+            
+            // 重置表单
+            commentForm.reset();
+        }, 1000);
+    });
+    
+    // 辅助函数
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    function createCommentHTML(author, comment) {
+        const date = new Date().toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        return `
+            <li class="comment">
+                <div class="comment">
+                    <div class="comment-author vcard user frame">
+                        <img src="style/images/default-avatar.png" class="avatar" alt="${author}" />
+                    </div>
+                    <div class="message">
+                        <span class="reply-link"><a class="comment-reply-link" href="#">回复</a></span>
+                        <div class="info">
+                            <h2>${author}</h2>
+                            <span class="meta">${date}</span>
+                        </div>
+                        <div class="comment-body">
+                            <p>${comment}</p>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </li>
+        `;
+    }
+    
+    function updateCommentCount() {
+        const commentCount = document.querySelectorAll('#singlecomments .comment').length;
+        const commentsTitle = document.getElementById('comments-title');
+        commentsTitle.textContent = `《晨光绚丽》收到的${commentCount}条评论`;
+    }
+    
+    function showMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-box ${type}`;
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <span class="message-text">${message}</span>
+                <button class="message-close">&times;</button>
+            </div>
+        `;
+        
+        document.body.appendChild(messageDiv);
+        
+        const closeBtn = messageDiv.querySelector('.message-close');
+        closeBtn.onclick = () => messageDiv.remove();
+        
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 3000);
+    }
+    
+    function showLoadingMessage(message) {
+        showMessage(`<i class="loading-icon"></i> ${message}`, 'loading');
+    }
+});
+</script>
+
+<!-- 添加必要的CSS样式 -->
+<style>
+/* 消息提示框样式 */
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    min-width: 250px;
+    padding: 15px;
+    border-radius: 4px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.message-box .message-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.message-box .message-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.message-box.success {
+    background: #4CAF50;
+    color: white;
+}
+
+.message-box.error {
+    background: #f44336;
+    color: white;
+}
+
+.message-box.loading {
+    background: #ff9800;
+    color: white;
+}
+
+.loading-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 评论表单验证样式 */
+.error-field {
+    border-color: #f44336 !important;
+}
+
+.required-mark {
+    color: #f44336;
+    margin-left: 4px;
+}
+</style>
 </body>
 </html>

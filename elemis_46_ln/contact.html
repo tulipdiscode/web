@@ -212,5 +212,178 @@
 </div>
 <!-- 页脚结束 --> 
 <script type="text/javascript" src="style/js/scripts.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.querySelector('.forms');
+    
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 获取表单数据
+        const formData = new FormData(contactForm);
+        const name = formData.get('name');
+        const email = formData.get('email');
+        const subject = formData.get('subject');
+        const message = formData.get('message');
+        
+        // 表单验证
+        if(!name || !email || !subject || !message) {
+            showMessage('请填写所有必填项', 'error');
+            return;
+        }
+        
+        // 验证邮箱格式
+        if(!isValidEmail(email)) {
+            showMessage('请输入正确的邮箱格式', 'error');
+            return;
+        }
+        
+        // 显示提交中状态
+        showLoadingMessage('正在提交...');
+        
+        // 模拟提交过程
+        setTimeout(() => {
+            showMessage('提交成功！我们会尽快与您联系', 'success');
+            contactForm.reset();
+        }, 1000);
+    });
+    
+    // 邮箱格式验证函数
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    // 消息提示函数
+    function showMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-box ${type}`;
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <span class="message-text">${message}</span>
+                <button class="message-close">&times;</button>
+            </div>
+        `;
+        
+        document.body.appendChild(messageDiv);
+        
+        const closeBtn = messageDiv.querySelector('.message-close');
+        closeBtn.onclick = () => messageDiv.remove();
+        
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 3000);
+    }
+    
+    // 显示加载中消息
+    function showLoadingMessage(message) {
+        showMessage(`<i class="loading-icon"></i> ${message}`, 'loading');
+    }
+});
+</script>
+
+<!-- 添加必要的CSS样式 -->
+<style>
+/* 消息提示框样式 */
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    min-width: 250px;
+    padding: 15px;
+    border-radius: 4px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.message-box .message-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.message-box .message-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.message-box .message-close:hover {
+    opacity: 1;
+}
+
+/* 不同类型消息的样式 */
+.message-box.success {
+    background: #4CAF50;
+    color: white;
+}
+
+.message-box.error {
+    background: #f44336;
+    color: white;
+}
+
+.message-box.info {
+    background: #2196F3;
+    color: white;
+}
+
+.message-box.loading {
+    background: #ff9800;
+    color: white;
+}
+
+/* 加载图标动画 */
+.loading-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+}
+
+/* 动画效果 */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 表单验证样式 */
+.text-input.error,
+.text-area.error {
+    border-color: #f44336;
+}
+
+.error-message {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* 必填项标记 */
+.required::after {
+    content: '*';
+    color: #f44336;
+    margin-left: 4px;
+}
+</style>
 </body>
 </html>
